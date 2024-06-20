@@ -15,7 +15,7 @@ const recipeSchema = new Schema(
     difficulty: { type: String },
     cuisineType: { type: String },
     dietaryRestrictions: [String],
-    author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    author: { type: Schema.Types.ObjectId, ref: "User", required: false },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     likes: [{ type: Schema.Types.ObjectId, ref: "Like" }],
     imageUrl: { type: String },

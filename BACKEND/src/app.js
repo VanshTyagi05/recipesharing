@@ -25,6 +25,7 @@ app.use(cookieParser())//Third-Party Middleware
 // routes
 
 import { router } from "./routes/user.routes.js";
+import { recipeRouter } from "./routes/recipe.routes.js";
 app.use('/api/v1/users', router);
-
+app.use('/api/v1/users', recipeRouter);
 export {app}

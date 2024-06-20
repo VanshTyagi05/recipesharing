@@ -1,4 +1,4 @@
-import Recipe from "../models/recipe.js";
+import {Recipe} from "../models/recipe.js";
 import { ApiError } from "../utilities/ApiError.js";
 import { ApiResponse } from "../utilities/ApiResponse.js"
 import {
@@ -6,7 +6,7 @@ import {
   deleteFromCloudinary,
 } from "../utilities/Cloudinary.js";
 // Add a new recipe
-exports.addRecipe = async (req, res) => {
+const addRecipe = async (req, res) => {
   const {
     title,
     description,
@@ -18,22 +18,33 @@ exports.addRecipe = async (req, res) => {
     dietaryRestrictions,
     authorId,
   } = req.body;
-  const imageLocalPath = req.files?.imageUrl.path;
 
-  if (!imageLocalPath) {
-    throw new ApiError(400, "Recipe image LocalPath  is required");
+  if (
+    [ title,
+      description,
+      ingredients,
+      instructions].some((field) => field?.trim() === "")
+  ) {
+    throw new ApiError(400, "Title Description ingredients and Instructions are required");
   }
-  const recipeimage = await uploadOnCloudinary(imageLocalPath);
 
-  const videoLocalPath = req.files?.videoUrl.path;
 
-  if (!videoLocalPath) {
-    throw new ApiError(400, "Recipe video LocalPath  is required");
-  }
-  const recipeVideo = await uploadOnCloudinary(videoLocalPath);
+  // const imageLocalPath = req.files?.imageUrl[0].path;
+
+  // if (!imageLocalPath) {
+  //   throw new ApiError(400, "Recipe image LocalPath  is required");
+  // }
+  // const recipeimage = await uploadOnCloudinary(imageLocalPath);
+
+  // const videoLocalPath = req.files?.videoUrl[0].path;
+
+  // if (!videoLocalPath) {
+  //   throw new ApiError(400, "Recipe video LocalPath  is required");
+  // }
+  // const recipeVideo = await uploadOnCloudinary(videoLocalPath);
 
   try {
-    const recipe = new Recipe({
+    const recipe = await  Recipe.create({
       title,
       description,
       ingredients,
@@ -43,22 +54,24 @@ exports.addRecipe = async (req, res) => {
       cuisineType,
       dietaryRestrictions,
       author: authorId,
-      imageUrl: recipeimage.url,
-      videoUrl: recipeVideo.url,
+      // imageUrl:recipeimage.url,
+      // videoUrl:recipeVideo.url
+      imageUrl,
+      videoUrl
     });
-    await recipe.save();
+   
 
     res.status(201).json(
-      ApiResponse(200,recipe,"Recipe Uploaded Successfully")
+      ApiResponse(200,{recipe},"Recipe Uploaded Successfully")
     );
   } catch (error) {
     res.status(500).json(
-      ApiError(400, "Unable to upload the Recipe"));
+      new ApiError(400, "Unable to upload the Recipe"));
   }
 };
 
 // Get all recipes
-exports.getRecipes = async (req, res) => {
+const getRecipes = async (req, res) => {
   try {
     const recipes = await Recipe.find().populate(
       "author",
@@ -71,7 +84,7 @@ exports.getRecipes = async (req, res) => {
 };
 
 // Get a single recipe
-exports.getRecipe = async (req, res) => {
+const getRecipe = async (req, res) => {
   const { recipeId } = req.params;
 
   try {
@@ -87,3 +100,7 @@ exports.getRecipe = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export {addRecipe,
+  getRecipe,getRecipes
+}
