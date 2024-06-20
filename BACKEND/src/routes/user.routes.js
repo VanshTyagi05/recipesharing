@@ -1,4 +1,5 @@
-import express from "express" 
+import express, { Router } from "express" 
+
 import {
   registerUser,
   loginUser,
@@ -8,13 +9,13 @@ import {
   getUserProfile
 }from '../controllers/userController.js';
 
-const router = express.Router();
+const router =Router();
 // Register a new user
 
 router.post('/register', registerUser);
 
 // Login a user
-router.post('/login', loginUser);
+router.route('/login').post(loginUser);
 
 // Get user profile
 router.get('/users/:userId', getUserProfile);
